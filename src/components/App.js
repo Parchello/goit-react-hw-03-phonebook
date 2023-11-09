@@ -12,11 +12,23 @@ export class App extends Component {
       { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
       { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
     ],
-    name: '',
-    number: '',
     filter: '',
   };
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.contacts !== this.state.contacts) {
+      window.localStorage.setItem(
+        'contacts',
+        JSON.stringify(this.state.contacts)
+      );
+    }
+  }
+  componentDidMount() {
+    const savedContacts = window.localStorage.getItem('contacts');
+    if (savedContacts !== null) {
+      this.setState({ contacts: JSON.parse(savedContacts) });
+    }
+  }
   addContact = newContact => {
     const { contacts } = this.state;
     const existedContact = contacts.some(
@@ -26,8 +38,8 @@ export class App extends Component {
       alert(`${newContact.name} is already in contact list`);
     } else {
       const idContact = {
-        ...newContact,
         id: nanoid(),
+        ...newContact,
       };
       this.setState(prevState => ({
         contacts: [...prevState.contacts, idContact],
